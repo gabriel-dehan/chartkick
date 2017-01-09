@@ -1001,22 +1001,23 @@
             });
           });
         };
-      };
 
-      this.formatData = function (data, formatterName) {
-        if (formatterName) {
-          var formatter = window[formatterName];
-          if (typeof formatter  == "function") {
-            for (var i = 1; i <= data.Nf[0].c.length - 1; i++) {
-              formatter().format(data, i);
+        this.formatData = function (data, formatterName) {
+          if (formatterName) {
+            var formatter = window[formatterName];
+            if (typeof formatter  == "function") {
+              for (var i = 1; i <= data.Nf[0].c.length - 1; i++) {
+                formatter().format(data, i);
+              }
+              return true;
+            } else {
+              return false;
             }
-            return true;
           } else {
             return false;
           }
-        } else {
-          return false;
-        }
+        };
+
       };
 
       adapters.push(GoogleChartsAdapter);
