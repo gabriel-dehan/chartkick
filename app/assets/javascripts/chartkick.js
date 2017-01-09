@@ -793,6 +793,7 @@
         };
 
         this.renderLineChart = function (chart) {
+          var self = this;
           waitForLoaded(function () {
             var chartOptions = {};
 
@@ -802,6 +803,8 @@
 
             var options = jsOptions(chart, chart.options, chartOptions);
             var data = createDataTable(chart.data, chart.discrete ? "string" : "datetime");
+            self.formatData(data, chart.options.library.formatter);
+
             chart.chart = new google.visualization.LineChart(chart.element);
             resize(function () {
               chart.chart.draw(data, options);
@@ -810,6 +813,8 @@
         };
 
         this.renderPieChart = function (chart) {
+          var self = this;
+
           waitForLoaded(function () {
             var chartOptions = {
               chartArea: {
@@ -837,6 +842,8 @@
             data.addColumn("number", "Value");
             data.addRows(chart.data);
 
+            self.formatData(data, chart.options.library.formatter);
+
             chart.chart = new google.visualization.PieChart(chart.element);
             resize(function () {
               chart.chart.draw(data, options);
@@ -845,10 +852,15 @@
         };
 
         this.renderColumnChart = function (chart) {
+          var self = this;
+
           waitForLoaded(function () {
             var options = jsOptions(chart, chart.options);
             var data = createDataTable(chart.data, "string");
             chart.chart = new google.visualization.ColumnChart(chart.element);
+
+            self.formatData(data, chart.options.library.formatter);
+
             resize(function () {
               chart.chart.draw(data, options);
             });
@@ -856,6 +868,8 @@
         };
 
         this.renderBarChart = function (chart) {
+          var self = this;
+
           waitForLoaded(function () {
             var chartOptions = {
               hAxis: {
@@ -866,6 +880,9 @@
             };
             var options = jsOptionsFunc(defaultOptions, hideLegend, setTitle, setBarMin, setBarMax, setStacked, setXtitle, setYtitle)(chart, chart.options, chartOptions);
             var data = createDataTable(chart.data, "string");
+
+            self.formatData(data, chart.options.library.formatter);
+
             chart.chart = new google.visualization.BarChart(chart.element);
             resize(function () {
               chart.chart.draw(data, options);
@@ -874,6 +891,8 @@
         };
 
         this.renderAreaChart = function (chart) {
+          var self = this;
+
           waitForLoaded(function () {
             var chartOptions = {
               isStacked: true,
@@ -882,6 +901,9 @@
             };
             var options = jsOptions(chart, chart.options, chartOptions);
             var data = createDataTable(chart.data, chart.discrete ? "string" : "datetime");
+
+            self.formatData(data, chart.options.library.formatter);
+
             chart.chart = new google.visualization.AreaChart(chart.element);
             resize(function () {
               chart.chart.draw(data, options);
@@ -890,6 +912,8 @@
         };
 
         this.renderGeoChart = function (chart) {
+          var self = this;
+
           waitForLoaded(function () {
             var chartOptions = {
               legend: "none",
@@ -904,6 +928,8 @@
             data.addColumn("number", chart.options.label || "Value");
             data.addRows(chart.data);
 
+            self.formatData(data, chart.options.library.formatter);
+
             chart.chart = new google.visualization.GeoChart(chart.element);
             resize(function () {
               chart.chart.draw(data, options);
@@ -912,6 +938,8 @@
         };
 
         this.renderScatterChart = function (chart) {
+          var self = this;
+
           waitForLoaded(function () {
             var chartOptions = {};
             var options = jsOptions(chart, chart.options, chartOptions);
@@ -934,6 +962,8 @@
             }
             data.addRows(rows2);
 
+            self.formatData(data, chart.options.library.formatter);
+
             chart.chart = new google.visualization.ScatterChart(chart.element);
             resize(function () {
               chart.chart.draw(data, options);
@@ -942,6 +972,8 @@
         };
 
         this.renderTimeline = function (chart) {
+          var self = this;
+
           waitForLoaded("timeline", function () {
             var chartOptions = {
               legend: "none"
@@ -959,6 +991,9 @@
             data.addRows(chart.data);
 
             chart.element.style.lineHeight = "normal";
+
+            self.formatData(data, chart.options.library.formatter);
+
             chart.chart = new google.visualization.Timeline(chart.element);
 
             resize(function () {
@@ -966,6 +1001,22 @@
             });
           });
         };
+      };
+
+      this.formatData = function (data, formatterName) {
+        if (formatterName) {
+          var formatter = window[formatterName];
+          if (typeof formatter  == "function") {
+            for (var i = 1; i <= data.Nf[0].c.length - 1; i++) {
+              formatter().format(data, i);
+            }
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
       };
 
       adapters.push(GoogleChartsAdapter);
